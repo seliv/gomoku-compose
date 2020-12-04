@@ -1,7 +1,11 @@
 import androidx.compose.ui.graphics.Color
+import example.imageviewer.view.DragHandler
+import example.imageviewer.view.ScaleHandler
 
 class BoardModel {
     internal val pieces: MutableMap<PieceLocation, PieceColor> = mutableMapOf()
+    val scaleHandler: ScaleHandler = ScaleHandler()
+    val dragHandler: DragHandler = DragHandler()
 
     init {
         pieces[PieceLocation(1, 1)] = PieceColor.WHITE

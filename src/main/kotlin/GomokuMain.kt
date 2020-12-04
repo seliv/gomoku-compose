@@ -9,11 +9,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.Canvas
 import androidx.compose.material.Surface
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import example.imageviewer.view.DragHandler
-import example.imageviewer.view.Draggable
-import example.imageviewer.view.ScaleHandler
-import example.imageviewer.view.Zoomable
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.toSize
+import example.imageviewer.view.*
 
 fun main() = Window {
     var text by remember { mutableStateOf("Hello, World!") }
@@ -35,20 +35,18 @@ fun main() = Window {
 private fun Board(
     boardModel: BoardModel
 ) {
-    val dragHandler = DragHandler()
-    val scaleHandler = ScaleHandler()
     Surface(
         modifier = Modifier.fillMaxSize()
     ) {
         Draggable(
-            onDrag = dragHandler,
+            onDrag = boardModel.dragHandler,
             modifier = Modifier.fillMaxSize()
         ) {
             Zoomable(
-                onScale = scaleHandler,
+                onScale = boardModel.scaleHandler,
                 modifier = Modifier.fillMaxSize()
             ) {
-                drawBoardInternal(boardModel, scaleHandler, dragHandler)
+                drawBoardInternal(boardModel)
             }
         }
     }
@@ -57,44 +55,48 @@ private fun Board(
 @Composable
 private fun drawBoardInternal(
     boardModel: BoardModel,
-    scaleHandler: ScaleHandler,
-    dragHandler: DragHandler
 ) {
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        var minX = boardModel.minX()
-        var minY = boardModel.minY()
-        var modelWidth = boardModel.maxX() - minX
-        var modelHeight = boardModel.maxY() - minY
-        if (modelWidth < 10) {
-            modelWidth = 10
+    val size = remember { mutableStateOf(Size.Zero) }
+    Canvas(modifier = Modifier
+        .fillMaxSize()
+        .onSizeChanged {
+            size.value = it.toSize()
         }
-        if (modelHeight < 10) {
-            modelHeight = 10
-        }
-        modelWidth = modelWidth * 1200 / 1000
-        modelHeight = modelHeight * 1200 / 1000
-        minX -= modelWidth * 1000 / 10000
-        minY -= modelHeight * 1000 / 10000
+    ) {
+        println("Canvas")
+        val maxX = boardModel.maxX()
+        val maxY = boardModel.maxY()
+        val minX = boardModel.minX()
+        val minY = boardModel.minY()
 
-        val cellWidth = size.width / modelWidth
-        val cellHeight = size.height / modelHeight
-
-        if (modelWidth * modelHeight <= 10_000) {
-            for (xd in boardModel.minX()..boardModel.maxX()) {
-                for (yd in boardModel.minY()..boardModel.maxY()) {
-                    val x = (xd - minX) * cellWidth
-                    val y = (yd - minY) * cellHeight
+        if ((maxX - minX) * (maxY - minY) <= 10_000) {
+            for (xd in minX..maxX) {
+                for (yd in minY..maxY) {
                     drawCircle(Color.Black, 2.0f,
-                        dragHandler.translate(scaleHandler.translate(Offset(x, y))))
+                        boardModel.dragHandler.translate(
+                            centerTranslate(
+                                boardModel.scaleHandler.translate(Offset(xd.toFloat(), yd.toFloat())), size.value
+                            )
+                        )
+                    )
                 }
             }
         }
 
         for (piece in boardModel.pieces) {
-            val x = (piece.key.x - minX) * cellWidth
-            val y = (piece.key.y - minY) * cellHeight
             drawCircle(piece.value.color, 10.0f,
-                dragHandler.translate(scaleHandler.translate(Offset(x, y))))
+                boardModel.dragHandler.translate(
+                    centerTranslate(
+                        boardModel.scaleHandler.translate(Offset(piece.key.x.toFloat(), piece.key.y.toFloat())), size.value
+                    )
+                )
+            )
         }
     }
+}
+
+const val DEFAULT_GRID_SIZE = 50
+
+private fun centerTranslate(offset: Offset, size: Size): Offset {
+    return Offset((size.width / 2.0 + offset.x * DEFAULT_GRID_SIZE).toFloat(), (size.height / 2.0 + offset.y * DEFAULT_GRID_SIZE).toFloat())
 }
