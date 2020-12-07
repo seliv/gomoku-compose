@@ -1,5 +1,6 @@
 package example.imageviewer.view
 
+import BoardModel
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.gesture.RawScaleObserver
 import androidx.compose.ui.gesture.doubleTapGestureFilter
@@ -29,7 +30,7 @@ fun Scalable (
     }
 }
 
-class ScaleHandler(private val maxFactor: Float = 5f, private val minFactor: Float = -10f) :
+class ScaleHandler(private val model: BoardModel, private val maxFactor: Float = 5f, private val minFactor: Float = -10f) :
     RawScaleObserver {
     val factor = mutableStateOf(1f)
 
@@ -43,6 +44,10 @@ class ScaleHandler(private val maxFactor: Float = 5f, private val minFactor: Flo
 
         if (maxFactor < factor.value) factor.value = maxFactor
         if (minFactor > factor.value) factor.value = minFactor
+
+        model.boardState.hoverPieceLocation.value = PieceLocation.INVALID_PIECE_LOCATION
+        model.boardState.hoverOffset.value = Offset.Zero
+        model.paintState()
 
         return scaleFactor
     }

@@ -1,5 +1,6 @@
 package example.imageviewer.view
 
+import BoardModel
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,7 +28,7 @@ fun Draggable(
     }
 }
 
-class DragHandler : DragObserver {
+class DragHandler(private val model: BoardModel) : DragObserver {
 
     private val amount = mutableStateOf(Point(0f, 0f))
     private val distance = mutableStateOf(Point(0f, 0f))
@@ -63,6 +64,10 @@ class DragHandler : DragObserver {
 
             distance.value = Point(distance.value.x + dx, distance.value.y + dy)
             amount.value = Point(amount.value.x + dx, amount.value.y + dy)
+
+            model.boardState.hoverPieceLocation.value = PieceLocation.INVALID_PIECE_LOCATION
+            model.boardState.hoverOffset.value = Offset.Zero
+            model.paintState()
 
             return dragDistance
         }
