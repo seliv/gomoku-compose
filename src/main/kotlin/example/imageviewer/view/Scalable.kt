@@ -56,4 +56,9 @@ class ScaleHandler(private val model: BoardModel, private val maxFactor: Float =
         val scale = factor.value.toDouble().pow(1.4).toFloat()
         return Offset(offset.x * scale, offset.y * scale)
     }
+
+    fun backTranslate(offset: Offset): Offset {
+        val scale = factor.value.toDouble().pow(1.4).toFloat()
+        return Offset(offset.x / scale, offset.y / scale)
+    }
 }

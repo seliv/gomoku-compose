@@ -78,6 +78,10 @@ class DragHandler(private val model: BoardModel) : DragObserver {
     fun translate(offset: Offset): Offset {
         return Offset(offset.x + amount.value.x, offset.y + amount.value.y)
     }
+
+    fun backTranslate(offset: Offset): Offset {
+        return Offset(offset.x - amount.value.x, offset.y - amount.value.y)
+    }
 }
 
 class Point {

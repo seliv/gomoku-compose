@@ -67,13 +67,28 @@ class BoardModel {
             RenderingHints.KEY_STROKE_CONTROL,
             RenderingHints.VALUE_STROKE_PURE
         )
-
-        val maxX = 1L + width / DEFAULT_GRID_SIZE / 2
-        val maxY = 1L + height / DEFAULT_GRID_SIZE / 2
-        val minX = -maxX
-        val minY = -maxY
-
         val size = Size(width.toFloat(), height.toFloat())
+
+        val minOffset = scaleHandler.backTranslate(
+            centerBackTranslate(
+                dragHandler.backTranslate(
+                    Offset(0.0f, 0.0f)
+                ), size
+            )
+        )
+        val maxOffset = scaleHandler.backTranslate(
+            centerBackTranslate(
+                dragHandler.backTranslate(
+                    Offset(size.width, size.height)
+                ), size
+            )
+        )
+
+        val maxX = maxOffset.x.toLong() + 2
+        val maxY = maxOffset.y.toLong() + 2
+        val minX = minOffset.x.toLong() - 2
+        val minY = minOffset.y.toLong() - 2
+
         val offset0 = centerTranslate(scaleHandler.translate(Offset(0.0f, 0.0f)), size)
         val offset1 = centerTranslate(scaleHandler.translate(Offset(1.0f, 0.0f)), size)
 
@@ -159,5 +174,12 @@ private fun centerTranslate(offset: Offset, size: Size): Offset {
     return Offset(
         (size.width / 2.0 + offset.x * DEFAULT_GRID_SIZE).toFloat(),
         (size.height / 2.0 + offset.y * DEFAULT_GRID_SIZE).toFloat()
+    )
+}
+
+private fun centerBackTranslate(offset: Offset, size: Size): Offset {
+    return Offset(
+        ((offset.x - size.width / 2.0) / DEFAULT_GRID_SIZE).toFloat(),
+        ((offset.y - size.height / 2.0) / DEFAULT_GRID_SIZE).toFloat()
     )
 }
