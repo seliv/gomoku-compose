@@ -15,6 +15,7 @@ class BoardModel {
     val scaleHandler: ScaleHandler = ScaleHandler(this)
     val dragHandler: DragHandler = DragHandler(this)
     var activePlayer: PieceColor = PieceColor.BLACK
+    var gameWinner: PieceColor? = null
 
     init {
         pieces[PieceLocation(1, 1)] = PieceColor.WHITE
@@ -38,8 +39,41 @@ class BoardModel {
     }
 
     private fun updateLegend() {
-        boardState.legendColor.value = activePlayer.color
-        boardState.legendText.value = "${activePlayer.displayName} player's turn"
+        if (gameWinner == null) {
+            boardState.legendColor.value = activePlayer.color
+            boardState.legendText.value = "${activePlayer.displayName} player's turn"
+        } else {
+            boardState.legendColor.value = Color.Green
+            boardState.legendText.value = "${gameWinner!!.displayName} player won the game"
+        }
+    }
+
+    private fun checkFiveInRow(location: PieceLocation) {
+        checkFiveInRow(location, 1, 0)
+        checkFiveInRow(location, 1, 1)
+        checkFiveInRow(location, 0, 1)
+        checkFiveInRow(location, -1, 1)
+    }
+
+    private fun checkFiveInRow(location: PieceLocation, dx: Long, dy: Long) {
+        if (!pieces.containsKey(location)) {
+            return
+        }
+        val color = pieces.get(location)
+        var lineStart = location
+        while (color == pieces.get(PieceLocation(lineStart.x - dx, lineStart.y - dy))) {
+            lineStart = PieceLocation(lineStart.x - dx, lineStart.y - dy)
+        }
+
+        var count = 0
+        while (color == pieces.get(lineStart)) {
+            count++
+            lineStart = PieceLocation(lineStart.x + dx, lineStart.y + dy)
+        }
+
+        if (count >= 5) {
+            gameWinner = color
+        }
     }
 
     fun makeTurn(location: PieceLocation) {
@@ -49,6 +83,7 @@ class BoardModel {
         pieces.put(location, activePlayer)
         activePlayer = activePlayer.nextPlayer()
 
+        checkFiveInRow(location)
         updateLegend()
         paintState()
     }
@@ -111,17 +146,19 @@ class BoardModel {
                             scaleHandler.translate(Offset(xd.toFloat(), yd.toFloat())), size
                         )
                     )
-                    if (
-                        (offset.x - boardState.hoverOffset.value.x) * (offset.x - boardState.hoverOffset.value.x) +
-                        (offset.y - boardState.hoverOffset.value.y) * (offset.y - boardState.hoverOffset.value.y) <=
-                        (SNAP_OFFSET * SNAP_OFFSET)
-                    ) {
-                        val pieceLocation = PieceLocation(xd, yd)
-                        if (!pieces.containsKey(pieceLocation)) {
-                            graphics.color = java.awt.Color.LIGHT_GRAY
-                            graphics.paint = graphics.color
-                            graphics.fillOval(offset.x.toInt() - 10, offset.y.toInt() - 10, 20, 20)
-                            boardState.hoverPieceLocation.value = pieceLocation
+                    if (gameWinner == null) {
+                        if (
+                            (offset.x - boardState.hoverOffset.value.x) * (offset.x - boardState.hoverOffset.value.x) +
+                            (offset.y - boardState.hoverOffset.value.y) * (offset.y - boardState.hoverOffset.value.y) <=
+                            (SNAP_OFFSET * SNAP_OFFSET)
+                        ) {
+                            val pieceLocation = PieceLocation(xd, yd)
+                            if (!pieces.containsKey(pieceLocation)) {
+                                graphics.color = java.awt.Color.LIGHT_GRAY
+                                graphics.paint = graphics.color
+                                graphics.fillOval(offset.x.toInt() - 10, offset.y.toInt() - 10, 20, 20)
+                                boardState.hoverPieceLocation.value = pieceLocation
+                            }
                         }
                     }
                     graphics.color = java.awt.Color.BLACK
