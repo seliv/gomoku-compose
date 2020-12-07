@@ -1,3 +1,4 @@
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import example.imageviewer.view.DragHandler
 import example.imageviewer.view.ScaleHandler
@@ -48,4 +49,8 @@ enum class PieceColor(val color: Color) {
 }
 
 data class PieceLocation(val x: Long, val y: Long) {
+    companion object {
+        @Stable
+        val INVALID_PIECE_LOCATION = PieceLocation(Long.MAX_VALUE, Long.MAX_VALUE)
+    }
 }
