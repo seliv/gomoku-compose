@@ -10,6 +10,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Surface
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerMoveFilter
@@ -27,7 +28,25 @@ fun main() = Window {
 
     MaterialTheme {
         Column {
-            Row(modifier = Modifier.fillMaxWidth()) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentSize(
+                    align = Alignment.CenterStart,
+                    unbounded = true
+                )
+            ) {
+                Button(modifier = Modifier.padding(end = 16.dp), onClick = {
+                    boardModel.scaleHandler.onScale(1.2f)
+                }) {
+                    Text("Zoom in")
+                }
+
+                Button(modifier = Modifier.padding(end = 16.dp), onClick = {
+                    boardModel.scaleHandler.onScale(0.8f)
+                }) {
+                    Text("Zoom out")
+                }
+
                 Button(modifier = Modifier.padding(end = 16.dp), onClick = {
                     boardModel.reset()
                 }) {
