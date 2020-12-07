@@ -1,8 +1,6 @@
 import androidx.compose.desktop.AppWindowAmbient
 import androidx.compose.desktop.ComposeWindow
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
@@ -10,11 +8,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Surface
 import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import example.imageviewer.view.*
 import java.awt.Cursor
@@ -24,6 +24,7 @@ import javax.imageio.ImageIO
 
 fun main() = Window {
     var text by remember { mutableStateOf("Hello, World!") }
+    val boardModel = BoardModel()
 
     MaterialTheme {
         Column {
@@ -33,7 +34,22 @@ fun main() = Window {
                 Text(text)
             }
 
-            Board(BoardModel())
+            Board(boardModel)
+
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+            ) {
+                Text(
+                    text = boardModel.boardState.legendText.value,
+                    color = boardModel.boardState.legendColor.value,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 16.dp),
+                    style = MaterialTheme.typography.body1
+                )
+            }
         }
     }
 }

@@ -33,6 +33,13 @@ class BoardModel {
         pieces[PieceLocation(5, 6)] = PieceColor.BLACK
         pieces[PieceLocation(6, -7)] = PieceColor.BLACK
         pieces[PieceLocation(2, -1)] = PieceColor.BLACK
+
+        updateLegend()
+    }
+
+    private fun updateLegend() {
+        boardState.legendColor.value = activePlayer.color
+        boardState.legendText.value = "${activePlayer.displayName} player's turn"
     }
 
     fun makeTurn(location: PieceLocation) {
@@ -42,6 +49,7 @@ class BoardModel {
         pieces.put(location, activePlayer)
         activePlayer = activePlayer.nextPlayer()
 
+        updateLegend()
         paintState()
     }
 
@@ -162,8 +170,8 @@ class BoardModel {
     }
 }
 
-enum class PieceColor(val color: Color) {
-    BLACK(Color.Blue), WHITE(Color.Red);
+enum class PieceColor(val color: Color, val displayName: String) {
+    BLACK(Color.Blue, "Blue"), WHITE(Color.Red, "Red");
 
     fun nextPlayer(): PieceColor {
         return values()[(this.ordinal + 1) % values().size]
