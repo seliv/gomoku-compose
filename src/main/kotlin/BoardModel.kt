@@ -19,7 +19,6 @@ class BoardModel {
     var gameWinner: PieceColor? = null
 
     init {
-
         updateLegend()
     }
 
@@ -259,14 +258,14 @@ data class PieceLocation(val x: Long, val y: Long) {
 
 const val DEFAULT_GRID_SIZE = 50
 
-private fun centerTranslate(offset: Offset, size: Size): Offset {
+fun centerTranslate(offset: Offset, size: Size): Offset {
     return Offset(
         (size.width / 2.0 + offset.x * DEFAULT_GRID_SIZE).toFloat(),
         (size.height / 2.0 + offset.y * DEFAULT_GRID_SIZE).toFloat()
     )
 }
 
-private fun centerBackTranslate(offset: Offset, size: Size): Offset {
+fun centerBackTranslate(offset: Offset, size: Size): Offset {
     return Offset(
         ((offset.x - size.width / 2.0) / DEFAULT_GRID_SIZE).toFloat(),
         ((offset.y - size.height / 2.0) / DEFAULT_GRID_SIZE).toFloat()
