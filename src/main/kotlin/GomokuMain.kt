@@ -23,15 +23,16 @@ import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
 
 fun main() = Window {
-    var text by remember { mutableStateOf("Hello, World!") }
     val boardModel = BoardModel()
 
     MaterialTheme {
         Column {
-            Button(onClick = {
-                text = "Hello, Desktop!"
-            }) {
-                Text(text)
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Button(onClick = {
+                    boardModel.reset()
+                }) {
+                    Text("New game")
+                }
             }
 
             Board(boardModel)

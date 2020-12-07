@@ -38,6 +38,14 @@ class BoardModel {
         updateLegend()
     }
 
+    fun reset() {
+        pieces.clear()
+        activePlayer = PieceColor.BLACK
+        gameWinner = null
+        updateLegend()
+        paintState()
+    }
+
     private fun updateLegend() {
         if (gameWinner == null) {
             boardState.legendColor.value = activePlayer.color
