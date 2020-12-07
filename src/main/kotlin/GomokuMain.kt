@@ -28,10 +28,28 @@ fun main() = Window {
     MaterialTheme {
         Column {
             Row(modifier = Modifier.fillMaxWidth()) {
-                Button(onClick = {
+                Button(modifier = Modifier.padding(end = 16.dp), onClick = {
                     boardModel.reset()
                 }) {
                     Text("New game")
+                }
+
+                Button(modifier = Modifier.padding(end = 16.dp), onClick = {
+                    boardModel.mockData()
+                }) {
+                    Text("Mock data")
+                }
+
+                Button(modifier = Modifier.padding(end = 16.dp), onClick = {
+                    boardModel.generateLargeBoard()
+                }) {
+                    Text("Large field")
+                }
+
+                Button(modifier = Modifier.padding(end = 16.dp), onClick = {
+                    boardModel.generateHugeBoard()
+                }) {
+                    Text("Huge field")
                 }
             }
 

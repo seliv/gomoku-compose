@@ -7,6 +7,7 @@ import example.imageviewer.view.DragHandler
 import example.imageviewer.view.ScaleHandler
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
+import kotlin.random.Random
 
 class BoardModel {
     val boardState: BoardState = BoardState()
@@ -18,6 +19,20 @@ class BoardModel {
     var gameWinner: PieceColor? = null
 
     init {
+
+        updateLegend()
+    }
+
+    fun reset() {
+        pieces.clear()
+        activePlayer = PieceColor.BLACK
+        gameWinner = null
+        updateLegend()
+        paintState()
+    }
+
+    fun mockData() {
+        reset()
         pieces[PieceLocation(1, 1)] = PieceColor.WHITE
         pieces[PieceLocation(-1, -1)] = PieceColor.BLACK
 
@@ -35,14 +50,26 @@ class BoardModel {
         pieces[PieceLocation(6, -7)] = PieceColor.BLACK
         pieces[PieceLocation(2, -1)] = PieceColor.BLACK
 
-        updateLegend()
+        paintState()
     }
 
-    fun reset() {
-        pieces.clear()
-        activePlayer = PieceColor.BLACK
-        gameWinner = null
-        updateLegend()
+    fun generateLargeBoard() {
+        generateRandomBoard(500, 10_000)
+    }
+
+    fun generateHugeBoard() {
+        generateRandomBoard(10_000, 100_000)
+    }
+
+    fun generateRandomBoard(range: Long, count: Int) {
+        reset()
+        for (i in 0..count) {
+            val x = Random.nextLong(-range, range)
+            val y = Random.nextLong(-range, range)
+            val location = PieceLocation(x, y)
+            val color = PieceColor.values()[i % PieceColor.values().size]
+            pieces[location] = color
+        }
         paintState()
     }
 
