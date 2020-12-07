@@ -91,10 +91,11 @@ class BoardModel {
 
         val offset0 = centerTranslate(scaleHandler.translate(Offset(0.0f, 0.0f)), size)
         val offset1 = centerTranslate(scaleHandler.translate(Offset(1.0f, 0.0f)), size)
+        val resolution = offset1.x - offset0.x
 
         boardState.hoverPieceLocation.value = PieceLocation.INVALID_PIECE_LOCATION
         // Skipping grid display if we can't click a point precisely enough
-        if (offset1.x - offset0.x > SNAP_OFFSET + SNAP_OFFSET) {
+        if (resolution > SNAP_OFFSET + SNAP_OFFSET) {
             for (xd in minX..maxX) {
                 for (yd in minY..maxY) {
                     val offset = dragHandler.translate(
@@ -130,7 +131,15 @@ class BoardModel {
             )
             graphics.color = java.awt.Color(piece.value.color.toArgb())
             graphics.paint = graphics.color
-            graphics.fillOval(offset.x.toInt() - 15, offset.y.toInt() - 15, 30, 30)
+            if (resolution > 30) {
+                graphics.fillOval(offset.x.toInt() - 15, offset.y.toInt() - 15, 30, 30)
+            } else if (resolution > 4) {
+                graphics.fillOval(offset.x.toInt() - resolution.toInt() / 2,
+                    offset.y.toInt() - resolution.toInt() / 2,
+                    resolution.toInt(), resolution.toInt())
+            } else {
+                graphics.drawLine(offset.x.toInt(), offset.y.toInt(), offset.x.toInt(), offset.y.toInt())
+            }
         }
 
         return image

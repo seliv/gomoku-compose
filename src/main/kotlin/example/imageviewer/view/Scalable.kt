@@ -30,7 +30,7 @@ fun Scalable (
     }
 }
 
-class ScaleHandler(private val model: BoardModel, private val maxFactor: Float = 5f, private val minFactor: Float = -10f) :
+class ScaleHandler(private val model: BoardModel, private val maxFactor: Float = 5f, private val minFactor: Float = 0.05f) :
     RawScaleObserver {
     val factor = mutableStateOf(1f)
 
