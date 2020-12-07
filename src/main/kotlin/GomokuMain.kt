@@ -9,12 +9,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.clickable
 import androidx.compose.material.Surface
 import androidx.compose.ui.gesture.ExperimentalPointerInput
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.toSize
@@ -72,39 +70,41 @@ private fun drawBoardInternal(
     Image(
         org.jetbrains.skija.Image.makeFromEncoded(
             toByteArray(boardModel.boardState.mainImage.value)
-            ).asImageBitmap(),
+        ).asImageBitmap(),
         modifier = Modifier
-        .fillMaxSize()
-        .onSizeChanged {
-            boardModel.boardState.size.value = it.toSize()
-            boardModel.paintState()
-        }
-        .pointerMoveFilter(
-            onMove = {
-                boardModel.boardState.hoverOffset.value = it
+            .fillMaxSize()
+            .onSizeChanged {
+                boardModel.boardState.size.value = it.toSize()
                 boardModel.paintState()
-                val cursor =
-                    if (PieceLocation.INVALID_PIECE_LOCATION == boardModel.boardState.hoverPieceLocation.value)
-                        Cursor.getDefaultCursor() else Cursor(Cursor.HAND_CURSOR)
-
-                if (window.cursor.type != cursor.type) {
-                    window.cursor = cursor
-                }
-
-                false
             }
-        )
-        .pointerInput {
-            forEachGesture {
-                handlePointerInput {
-                    val down = awaitFirstDown()
-                    val x = down.current.position.x
-                    val y = down.current.position.y
-                    println("touch x = ${x}")
-                    println("touch.y = ${y}")
+            .pointerMoveFilter(
+                onMove = {
+                    boardModel.boardState.hoverOffset.value = it
+                    boardModel.paintState()
+                    val cursor =
+                        if (PieceLocation.INVALID_PIECE_LOCATION == boardModel.boardState.hoverPieceLocation.value)
+                            Cursor.getDefaultCursor() else Cursor(Cursor.HAND_CURSOR)
+
+                    if (window.cursor.type != cursor.type) {
+                        window.cursor = cursor
+                    }
+
+                    false
                 }
-            }
-        }
+            )
+            .clickable(
+                onClick = {
+                    if (PieceLocation.INVALID_PIECE_LOCATION != boardModel.boardState.hoverPieceLocation.value) {
+                        boardModel.makeTurn(boardModel.boardState.hoverPieceLocation.value)
+                    }
+                },
+                onLongClick = {
+                    boardModel.scaleHandler.onScale(1.2f)
+                },
+                onDoubleClick = {
+                    boardModel.scaleHandler.onScale(0.8f)
+                }
+            )
     )
 }
 

@@ -14,6 +14,7 @@ class BoardModel {
     internal val pieces: MutableMap<PieceLocation, PieceColor> = mutableMapOf()
     val scaleHandler: ScaleHandler = ScaleHandler(this)
     val dragHandler: DragHandler = DragHandler(this)
+    var activePlayer: PieceColor = PieceColor.BLACK
 
     init {
         pieces[PieceLocation(1, 1)] = PieceColor.WHITE
@@ -34,6 +35,16 @@ class BoardModel {
         pieces[PieceLocation(2, -1)] = PieceColor.BLACK
     }
 
+    fun makeTurn(location: PieceLocation) {
+        if (pieces.containsKey(location)) {
+            throw RuntimeException("Illegal move: location is already taken: $location")
+        }
+        pieces.put(location, activePlayer)
+        activePlayer = activePlayer.nextPlayer()
+
+        paintState()
+    }
+
     fun paintState() {
         boardState.mainImage.value = paintState(
             boardState.size.value.width.toInt(),
@@ -42,7 +53,7 @@ class BoardModel {
         boardState.mainImage.value
     }
 
-    private fun paintState(width: Int, height: Int): BufferedImage {
+    fun paintState(width: Int, height: Int): BufferedImage {
         if ((width <= 0) || (height <= 0)) {
             return BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB)
         }
@@ -128,7 +139,11 @@ class BoardModel {
 }
 
 enum class PieceColor(val color: Color) {
-    BLACK(Color.Blue), WHITE(Color.Red)
+    BLACK(Color.Blue), WHITE(Color.Red);
+
+    fun nextPlayer(): PieceColor {
+        return values()[(this.ordinal + 1) % values().size]
+    }
 }
 
 data class PieceLocation(val x: Long, val y: Long) {
